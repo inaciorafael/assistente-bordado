@@ -1,11 +1,24 @@
 import os
 from PIL import Image, ImageOps
 import numpy as np
+import argparse
 
 script_path = os.path.abspath(__file__)
 script_dir = os.path.dirname(script_path)
-input_image_path = f"{script_dir}/input_image.jpeg"
 
+resized_images_path = f"{script_dir}/resized_images"
+images_to_resize_path = f"{script_dir}/images_to_resize"
+images_to_resize = os.listdir(images_to_resize_path)
+
+# Cria o analisador de argumentos
+parser = argparse.ArgumentParser(description="Argumentos para redimensionar imagem")
+
+# Adiciona os argumentos que o script deve aceitar
+parser.add_argument('--size', type=float, help='Tamanho da imagem em centimetros', required=True)
+parser.add_argument('--padding', type=float, help='Tamanho do padding em centrimetros')
+
+# Analisa os argumentos fornecidos
+args = parser.parse_args()
 
 def resize_and_prepare_for_print(image_path, output_path, hoop_width_cm, hoop_height_cm, padding_cm, dpi):
     # Converter dimensões de centímetros para pixels usando DPI
@@ -56,12 +69,18 @@ def resize_and_prepare_for_print(image_path, output_path, hoop_width_cm, hoop_he
     final_image.save(output_path)
     print(f'Imagem redimensionada, com padding e apenas preto salva em: {output_path}')
 
-# Exemplo de uso
-resize_and_prepare_for_print(
-    input_image_path,
-    'prepared_image_for_print.jpg',
-    hoop_width_cm=10.0,
-    hoop_height_cm=10.0,
-    padding_cm=0,
-    dpi=300
-)
+for image in images_to_resize:
+    image_path = f"{images_to_resize_path}/{image}"
+
+    resize_and_prepare_for_print(
+        image_path,
+        f"{resized_images_path}/{args.size}x{args.size}@{image}",
+        hoop_width_cm=args.size,
+        hoop_height_cm=args.size,
+        padding_cm=args.padding if args.padding else 0,
+        dpi=300
+    )
+#
+# # input_image_path = f"{script_dir}/input_image.jpeg"
+#
+# # Exemplo de uso
